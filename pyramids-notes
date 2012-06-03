@@ -1,0 +1,78 @@
+3
+2 6
+2 5 7
+7 3 7 4
+4 6 8 2 1
+0 3 7 1 8 4
+9 9 3 7 2 7 9
+9 5 3 7 2 9 2 7
+
+1 2 3 4 5 6 7 8
+3 6 7 7 8 7 7 7
+
+node(root,3,a1,a2).
+node(a1,2,[],[]).
+node(a2,6,[],[]).
+
+node(Name) :- 
+  node(Name,Value,Left,Right),
+  constant(Name),
+  integer(Value),
+  node(Left),
+  node(Right).
+node([]).
+
+path(Node, [Value]) :-
+  node(Node, Value, [], []).
+path(Node, [Value|Path]) :-
+  node(Node, Value, Left, Right),
+  path(Left, Left-path),
+  path(Right, Right-path),
+  max-path(Left-path, Right-path, Path).
+
+max-path(Left, Right, Left) :-
+  sum(Left, LSum),
+  sum(Right, RSum),
+  LSum > RSum.
+max-path(Left, Right, Right) :-
+  sum(Left, LSum),
+  sum(Right, RSum),
+  RSum > LSum.
+
+
+row.each{|parent|
+  parent.path << max_path(parent)
+}
+  
+path(parent) {
+  if(parent.left.value == nil || parent.right.value == nil) {
+    return parent.value
+  } else {
+    if(parent.path == nil) {
+      parent.path = parent.value + max_path(path(left), path(right))
+    }
+    return parent.path
+  }
+}
+
+(define (value node) (car node))
+(define (left node) (cadr node))
+(define (right node) (caddr node))
+
+(define (path parent)
+  (if (or (null? (left parent)) (null? (right parent)))
+    (value parent)
+    (cons (value parent) (max-path (path left) (path right)))))
+
+(define (max-path left right)
+  (if (> (sum left) (sum right))
+    left
+    right))
+
+max_path(left, right) {
+  if(sum(left) > sum(right)) {
+    return left
+  } else {
+    return right
+  }
+}
